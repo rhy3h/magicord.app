@@ -13,14 +13,17 @@ export default function SidebarItem(props: ISidebarItem) {
   const routeUrl = router.pathname.split("/").pop();
   const { name, url } = props;
 
+  const isActiveRoute = url == routeUrl;
+
   return (
     <>
       <li>
         <Link
           className={classNames({
-            "relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6":
+            "relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 hover:border-indigo-500 pr-6":
               true,
-            "border-indigo-500": url == routeUrl,
+            "border-transparent": !isActiveRoute,
+            "border-indigo-500": isActiveRoute,
           })}
           href={`/dashboard/${router.query.guild_id}/${url}`}
         >
