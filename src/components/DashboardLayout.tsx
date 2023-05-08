@@ -3,6 +3,7 @@ import SideBar from "./SideBar";
 import { useSelector } from "react-redux";
 import { DiscordState } from "@/store/namespace/discordSlice";
 import { RootState } from "@/store";
+import Spinner from "@/components/Modules/Spinner";
 
 export default function DashboardLayout(props: PropsWithChildren) {
   const discordStore = useSelector<RootState>(
@@ -30,13 +31,7 @@ export default function DashboardLayout(props: PropsWithChildren) {
           <div className="p-[40px] h-[calc(100vh-80px)] overflow-auto">
             {discordStore.guilds.loading ? (
               <div className="flex items-center justify-center h-screen">
-                <div
-                  className="animate-spin inline-block w-12 h-12 border-[3px] border-current border-t-transparent text-blue-600 rounded-full"
-                  role="status"
-                  aria-label="loading"
-                >
-                  <span className="sr-only">Loading...</span>
-                </div>
+                <Spinner width="w-12" height="h-12" />
               </div>
             ) : (
               props.children

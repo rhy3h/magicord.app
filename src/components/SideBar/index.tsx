@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { DiscordState, fetchGuilds } from "@/store/namespace/discordSlice";
 import { AppDispatch, RootState } from "@/store";
+import Spinner from "@/components/Modules/Spinner";
 
 export default function SideBar() {
   const router = useRouter();
@@ -41,30 +42,30 @@ export default function SideBar() {
         </Link>
 
         <div className="px-4">
-          <select
-            id="channel"
-            name="channel"
-            value={router.query.guild_id}
-            className="block w-full m- rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-            onChange={onGuildChange}
-          >
-            {discordStore.guilds.data.map((guild, index) => (
-              <option key={index} value={guild.id}>
-                {guild.name}
-              </option>
-            ))}
-          </select>
+          {discordStore.guilds.loading ? (
+            <div className="block w-full h-9 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300">
+              <Spinner width="w-6" height="h-6" />
+            </div>
+          ) : (
+            <select
+              id="channel"
+              name="channel"
+              value={router.query.guild_id}
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+              onChange={onGuildChange}
+            >
+              {discordStore.guilds.data.map((guild, index) => (
+                <option key={index} value={guild.id}>
+                  {guild.name}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         {discordStore.guilds.loading ? (
           <div className="flex items-center justify-center h-screen">
-            <div
-              className="animate-spin inline-block w-12 h-12 border-[3px] border-current border-t-transparent text-blue-600 rounded-full"
-              role="status"
-              aria-label="loading"
-            >
-              <span className="sr-only">Loading...</span>
-            </div>
+            <Spinner width="w-12" height="h-12" />
           </div>
         ) : (
           <div className="overflow-y-auto overflow-x-hidden flex-grow">

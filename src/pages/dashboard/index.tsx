@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DiscordState, fetchGuilds } from "@/store/namespace/discordSlice";
 import { AppDispatch, RootState } from "@/store";
+import Spinner from "@/components/Modules/Spinner";
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();
@@ -18,13 +19,7 @@ export default function Dashboard() {
     <>
       <main className={`flex min-h-screen items-center justify-evenly p-24`}>
         {discordStore.guilds.loading ? (
-          <div
-            className="animate-spin inline-block w-12 h-12 border-[3px] border-current border-t-transparent text-blue-600 rounded-full"
-            role="status"
-            aria-label="loading"
-          >
-            <span className="sr-only">Loading...</span>
-          </div>
+          <Spinner width="w-12" height="h-12" />
         ) : (
           discordStore.guilds.data.map((guilds, index) => (
             <Link
