@@ -1,7 +1,14 @@
 import React, { PropsWithChildren } from "react";
 import SideBar from "./SideBar";
+import { useSelector } from "react-redux";
+import { DiscordState } from "@/store/namespace/discordSlice";
+import { RootState } from "@/store";
 
 export default function DashboardLayout(props: PropsWithChildren) {
+  const discordStore = useSelector<RootState>(
+    (state) => state.discord
+  ) as DiscordState;
+
   return (
     <>
       <div className="flex">
@@ -21,7 +28,19 @@ export default function DashboardLayout(props: PropsWithChildren) {
             </div>
           </div>
           <div className="p-[40px] h-[calc(100vh-80px)] overflow-auto">
-            {props.children}
+            {discordStore.guilds.loading ? (
+              <div className="flex items-center justify-center h-screen">
+                <div
+                  className="animate-spin inline-block w-12 h-12 border-[3px] border-current border-t-transparent text-blue-600 rounded-full"
+                  role="status"
+                  aria-label="loading"
+                >
+                  <span className="sr-only">Loading...</span>
+                </div>
+              </div>
+            ) : (
+              props.children
+            )}
           </div>
         </div>
       </div>
