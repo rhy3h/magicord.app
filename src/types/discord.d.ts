@@ -18,3 +18,12 @@ export interface Channel extends BaseGuild {
   guild_id: string;
   position: number;
 }
+
+export interface ReactionRole extends BaseGuild {
+  id: string;
+  name: string;
+  channel_id: string;
+  message_id: string;
+  message_content: string;
+  reactions: Array<Reaction>;
+}
