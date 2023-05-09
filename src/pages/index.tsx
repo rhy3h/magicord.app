@@ -23,10 +23,13 @@ function Panel(props: { user: Session }) {
       <div className={`flex-col items-center text-center p-24`}>
         <h1>Hello, {user.user?.name}</h1>
 
-        <div>
-          <button className="group rounded-lg border mt-5 px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
+        <div className="mt-5">
+          <Link
+            className="group rounded-lg border  px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+            href={`dashboard`}
+          >
             Dashboard
-          </button>
+          </Link>
         </div>
 
         <div>
