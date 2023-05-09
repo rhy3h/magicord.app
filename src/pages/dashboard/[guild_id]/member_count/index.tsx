@@ -1,6 +1,6 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { useSelector } from "react-redux";
-import { DiscordState } from "@/store/namespace/discordSlice";
+import { ChannelType, DiscordState } from "@/store/namespace/discordSlice";
 import { RootState } from "@/store";
 
 export default function MemberCount() {
@@ -59,8 +59,12 @@ export default function MemberCount() {
                       name="channel"
                       className="block w-full m- rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                     >
-                      {discordStore.channels.data.map((channel, index) => (
-                        <option key={index} value={channel.id}>
+                      {discordStore.channels.text.map((channel, index) => (
+                        <option
+                          key={index}
+                          value={channel.id}
+                          disabled={channel.type == ChannelType.CATEGORY}
+                        >
                           {channel.name}
                         </option>
                       ))}

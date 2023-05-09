@@ -3,7 +3,11 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { DiscordState, fetchGuilds } from "@/store/namespace/discordSlice";
+import {
+  DiscordState,
+  fetchChannels,
+  fetchGuilds,
+} from "@/store/namespace/discordSlice";
 import { AppDispatch, RootState } from "@/store";
 import Spinner from "@/components/Modules/Spinner";
 
@@ -15,13 +19,21 @@ export default function SideBar() {
   ) as DiscordState;
 
   useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
+
     if (!discordStore.guilds.data.length) {
       dispatch(fetchGuilds());
     }
-  }, []);
+    if (!discordStore.channels.data.length) {
+      dispatch(fetchChannels(router.query.guild_id as string));
+    }
+  }, [router.isReady]);
 
   const onGuildChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const guildId = e.target.value;
+    dispatch(fetchChannels(guildId));
     router.replace(
       {
         pathname: "/dashboard/[guild_id]",
@@ -63,7 +75,7 @@ export default function SideBar() {
           )}
         </div>
 
-        {discordStore.guilds.loading ? (
+        {discordStore.guilds.loading || discordStore.channels.loading ? (
           <div className="flex items-center justify-center h-screen">
             <Spinner width="w-12" height="h-12" />
           </div>

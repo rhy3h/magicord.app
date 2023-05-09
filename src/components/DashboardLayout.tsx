@@ -29,7 +29,7 @@ export default function DashboardLayout(props: PropsWithChildren) {
             </div>
           </div>
           <div className="p-[40px] h-[calc(100vh-80px)] overflow-auto">
-            {discordStore.guilds.loading ? (
+            {discordStore.guilds.loading || discordStore.channels.loading ? (
               <div className="flex items-center justify-center h-screen">
                 <Spinner width="w-12" height="h-12" />
               </div>
