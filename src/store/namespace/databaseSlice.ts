@@ -16,6 +16,13 @@ const initialState: DBState = {
   error: undefined,
 };
 
+export const initDatabase = createAsyncThunk(
+  "database/init",
+  async (id: string) => {
+    return axios.post(`/api/database/${id}`).then((response) => response.data);
+  }
+);
+
 export const fetchDatabase = createAsyncThunk(
   "database/fetchAll",
   async (id: string) => {
