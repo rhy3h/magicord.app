@@ -10,10 +10,10 @@ interface ISidebarItem {
 
 export default function SidebarItem(props: ISidebarItem) {
   const router = useRouter();
-  const routeUrl = router.pathname.split("/").pop();
+  const routeUrl = router.pathname.split("/");
   const { name, url } = props;
 
-  const isActiveRoute = url == routeUrl;
+  const isActiveRoute = url == routeUrl?.[3];
 
   return (
     <>
@@ -25,16 +25,14 @@ export default function SidebarItem(props: ISidebarItem) {
             "border-transparent": !isActiveRoute,
             "border-indigo-500": isActiveRoute,
           })}
-          href={`/dashboard/${router.query.guild_id}/${url}`}
-        >
+          href={`/dashboard/${router.query.guild_id}/${url}`}>
           <span className="inline-flex justify-center items-center ml-4">
             <svg
               className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            ></svg>
+              xmlns="http://www.w3.org/2000/svg"></svg>
           </span>
           <span className="ml-2 text-sm tracking-wide truncate">{name}</span>
         </Link>
