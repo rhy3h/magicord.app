@@ -5,10 +5,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { channel_id } = req.query;
+  const { guild_id } = req.query;
 
   await axios
-    .get(`https://discord.com/api/guilds/${channel_id}/channels`, {
+    .get(`https://discord.com/api/guilds/${guild_id}/roles`, {
       headers: {
         Authorization: `Bot ${process.env.MAGICORD_ACCESS_TOKEN}`,
       },

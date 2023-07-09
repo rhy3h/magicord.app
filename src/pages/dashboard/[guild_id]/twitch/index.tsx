@@ -1,12 +1,24 @@
 import DashboardLayout from "@/components/DashboardLayout";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ChannelType, DiscordState } from "@/store/namespace/discordSlice";
-import { RootState } from "@/store";
+import { AppDispatch, RootState } from "@/store";
+import { useRouter } from "next/router";
+import {
+  saveDB,
+  setTwitchChannelId,
+  setTwitchMessage,
+} from "@/store/namespace/databaseSlice";
+import type { GuildWithMessage } from "@/models/Guilds";
 
 export default function Twitch() {
+  const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const discordStore = useSelector<RootState>(
     (state) => state.discord
   ) as DiscordState;
+  const twitch_alert = useSelector<RootState>(
+    (state) => state.database.data?.twitch_alert
+  ) as GuildWithMessage;
 
   return (
     <>
@@ -29,6 +41,18 @@ export default function Twitch() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => {
+                    const id = router.query.guild_id as string;
+                    const data = {
+                      "twitch_alert.channel_id": twitch_alert.channel_id,
+                      "twitch_alert.message": twitch_alert.message,
+                    };
+                    dispatch(saveDB({ id, data })).then((result) => {
+                      if (result.meta.requestStatus == "rejected") {
+                        alert("Error");
+                      }
+                    });
+                  }}
                   className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                   Save
@@ -52,10 +76,13 @@ export default function Twitch() {
                   </label>
                   <div className="mt-2">
                     <select
-                      id="channel"
-                      name="channel"
+                      defaultValue={twitch_alert?.channel_id}
+                      onChange={(e) =>
+                        dispatch(setTwitchChannelId(e.target.value))
+                      }
                       className="block w-full m- rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                     >
+                      <option value={""}></option>
                       {discordStore.channels.text.map((channel, index) => (
                         <option
                           key={index}
@@ -78,11 +105,12 @@ export default function Twitch() {
                   </label>
                   <div className="mt-2">
                     <textarea
-                      id="message"
-                      name="message"
                       rows={3}
+                      defaultValue={twitch_alert?.message}
+                      onChange={(e) =>
+                        dispatch(setTwitchMessage(e.target.value))
+                      }
                       className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      defaultValue={""}
                     />
                   </div>
                 </div>

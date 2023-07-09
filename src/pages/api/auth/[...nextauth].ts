@@ -7,7 +7,7 @@ const scopes = ["identify"].join(" ");
 export default NextAuth({
   providers: [
     DiscordProvider({
-      clientId: process.env.MAGICORD_CLIENT_ID as string,
+      clientId: process.env.NEXT_PUBLIC_MAGICORD_CLIENT_ID as string,
       clientSecret: process.env.MAGICORD_CLIENT_SECRET as string,
       authorization: { params: { scope: scopes } },
     }),

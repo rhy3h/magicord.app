@@ -6,8 +6,15 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   DiscordState,
   fetchChannels,
+  fetchEmojis,
   fetchGuilds,
+  fetchRoles,
 } from "@/store/namespace/discordSlice";
+import {
+  DBState,
+  fetchDatabase,
+  initDatabase,
+} from "@/store/namespace/databaseSlice";
 import { AppDispatch, RootState } from "@/store";
 import Spinner from "@/components/Modules/Spinner";
 
@@ -17,6 +24,7 @@ export default function SideBar() {
   const discordStore = useSelector<RootState>(
     (state) => state.discord
   ) as DiscordState;
+  const dbStore = useSelector<RootState>((state) => state.database) as DBState;
 
   useEffect(() => {
     if (!router.isReady) {
@@ -29,11 +37,29 @@ export default function SideBar() {
     if (!discordStore.channels.data.length) {
       dispatch(fetchChannels(router.query.guild_id as string));
     }
+    if (!discordStore.roles.data.length) {
+      dispatch(fetchRoles(router.query.guild_id as string));
+    }
+    if (!discordStore.emojis.data.length) {
+      dispatch(fetchEmojis(router.query.guild_id as string));
+    }
+    if (!dbStore.data) {
+      dispatch(fetchDatabase(router.query.guild_id as string)).then(
+        (result) => {
+          if (!result.payload) {
+            dispatch(initDatabase(router.query.guild_id as string));
+          }
+        }
+      );
+    }
   }, [router.isReady]);
 
   const onGuildChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const guildId = e.target.value;
     dispatch(fetchChannels(guildId));
+    dispatch(fetchRoles(guildId));
+    dispatch(fetchEmojis(guildId));
+    dispatch(fetchDatabase(guildId));
     router.replace(
       {
         pathname: "/dashboard/[guild_id]",
@@ -60,8 +86,6 @@ export default function SideBar() {
             </div>
           ) : (
             <select
-              id="channel"
-              name="channel"
               value={router.query.guild_id}
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
               onChange={onGuildChange}
@@ -96,12 +120,12 @@ export default function SideBar() {
               ></SidebarItem>
               <SidebarItem
                 name={"Reaction Roles"}
-                url={"reaction_roles"}
+                url={"reaction-roles"}
                 icon={"#reaction"}
               ></SidebarItem>
               <SidebarItem
                 name={"Member Count"}
-                url={"member_count"}
+                url={"member-count"}
                 icon={"#count"}
               ></SidebarItem>
               <li className="px-5">
@@ -113,7 +137,7 @@ export default function SideBar() {
               </li>
               <SidebarItem
                 name={"Temporary Channel"}
-                url={"temporary_channel"}
+                url={"temporary-channel"}
                 icon={"#voicechannel"}
               ></SidebarItem>
               <li className="px-5">
