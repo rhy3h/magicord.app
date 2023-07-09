@@ -1,4 +1,4 @@
-# Magicord Website
+# [Magicord Website](https://magicord.vercel.app/)
 
 [![wakatime](https://wakatime.com/badge/github/rhy3h/magicord.app.svg)](https://wakatime.com/badge/github/rhy3h/magicord.app)
 
