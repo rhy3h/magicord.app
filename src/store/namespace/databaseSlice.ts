@@ -278,6 +278,9 @@ export const dbSlice = createSlice({
       state.error = undefined;
     });
     builder.addCase(fetchDatabase.fulfilled, (state, action) => {
+      if (!action.payload) {
+        return;
+      }
       state.loading = false;
       state.data = action.payload;
       state.original_data = action.payload;
