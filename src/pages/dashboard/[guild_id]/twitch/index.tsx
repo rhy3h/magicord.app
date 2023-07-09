@@ -7,8 +7,9 @@ import {
   saveDB,
   setTwitchChannelId,
   setTwitchMessage,
+  setTwitchTwitchId,
 } from "@/store/namespace/databaseSlice";
-import type { GuildWithMessage } from "@/models/Guilds";
+import type { TwitchAlert } from "@/models/Guilds";
 
 export default function Twitch() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function Twitch() {
   ) as DiscordState;
   const twitch_alert = useSelector<RootState>(
     (state) => state.database.data?.twitch_alert
-  ) as GuildWithMessage;
+  ) as TwitchAlert;
 
   return (
     <>
@@ -45,6 +46,7 @@ export default function Twitch() {
                     const id = router.query.guild_id as string;
                     const data = {
                       "twitch_alert.channel_id": twitch_alert.channel_id,
+                      "twitch_alert.twitch_id": twitch_alert.twitch_id,
                       "twitch_alert.message": twitch_alert.message,
                     };
                     dispatch(saveDB({ id, data })).then((result) => {
@@ -93,6 +95,24 @@ export default function Twitch() {
                         </option>
                       ))}
                     </select>
+                  </div>
+                </div>
+
+                <div className="col-span-full">
+                  <label
+                    htmlFor="about"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Alert Message
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      defaultValue={twitch_alert?.twitch_id}
+                      onChange={(e) =>
+                        dispatch(setTwitchTwitchId(e.target.value))
+                      }
+                      className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
                   </div>
                 </div>
 

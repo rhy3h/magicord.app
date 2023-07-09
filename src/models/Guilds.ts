@@ -20,6 +20,11 @@ export class GuildWithName extends GuildBase {
   name: string;
 }
 
+export class TwitchAlert extends GuildWithMessage {
+  @prop({ default: "" })
+  twitch_id: string;
+}
+
 @modelOptions({ schemaOptions: { collection: "reactions", strict: "throw" } })
 export class Reactions {
   _id: Types.ObjectId;
@@ -86,7 +91,7 @@ export class Guilds {
   temporary_channels: GuildWithName;
 
   @prop({ default: {} })
-  twitch_alert: GuildWithMessage;
+  twitch_alert: TwitchAlert;
 
   @prop({ default: {} })
   member_count: GuildWithMessage;

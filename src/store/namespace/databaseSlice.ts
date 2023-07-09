@@ -177,6 +177,9 @@ export const dbSlice = createSlice({
     setTwitchChannelId(state, action: PayloadAction<string>) {
       state.data!.twitch_alert.channel_id = action.payload;
     },
+    setTwitchTwitchId(state, action: PayloadAction<string>) {
+      state.data!.twitch_alert.twitch_id = action.payload;
+    },
     setTwitchMessage(state, action: PayloadAction<string>) {
       state.data!.twitch_alert.message = action.payload;
     },
@@ -322,6 +325,7 @@ export const {
   setMemberCountChannelId,
   setTemporaryChannelName,
   setTwitchChannelId,
+  setTwitchTwitchId,
   setTwitchMessage,
   setReactionRoleChannelId,
   setReactionRoleMessage,
