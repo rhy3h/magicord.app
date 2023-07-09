@@ -103,7 +103,7 @@ export default function Twitch() {
                     htmlFor="about"
                     className="block text-sm font-medium leading-6 text-gray-900"
                   >
-                    Alert Message
+                    Twitch ID
                   </label>
                   <div className="mt-2">
                     <input
