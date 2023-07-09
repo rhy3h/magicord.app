@@ -1,4 +1,4 @@
-import { modelOptions, prop } from "@typegoose/typegoose";
+import { Severity, modelOptions, prop } from "@typegoose/typegoose";
 import { Schema, Types } from "mongoose";
 
 @modelOptions({ schemaOptions: { _id: false, strict: "throw" } })
@@ -36,6 +36,9 @@ export class Reactions {
 
 @modelOptions({
   schemaOptions: { collection: "reaction_roles", strict: "throw" },
+  options: {
+    allowMixed: Severity.ALLOW,
+  },
 })
 export class ReactionRoles {
   _id: Types.ObjectId;
@@ -56,7 +59,7 @@ export class ReactionRoles {
   message: string;
 
   @prop({
-    type: Array<Schema.Types.ObjectId>,
+    type: Array<Schema.Types.Mixed>,
     ref: Reactions,
     default: [],
   })
@@ -65,6 +68,9 @@ export class ReactionRoles {
 
 @modelOptions({
   schemaOptions: { collection: "guilds", strict: "throw" },
+  options: {
+    allowMixed: Severity.ALLOW,
+  },
 })
 export class Guilds {
   @prop({ required: true })
@@ -86,7 +92,7 @@ export class Guilds {
   member_count: GuildWithMessage;
 
   @prop({
-    type: Array<Schema.Types.ObjectId>,
+    type: Schema.Types.Mixed,
     ref: ReactionRoles,
     default: [],
   })
