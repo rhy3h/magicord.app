@@ -10,7 +10,11 @@ import {
   fetchGuilds,
   fetchRoles,
 } from "@/store/namespace/discordSlice";
-import { DBState, fetchDatabase } from "@/store/namespace/databaseSlice";
+import {
+  DBState,
+  fetchDatabase,
+  initDatabase,
+} from "@/store/namespace/databaseSlice";
 import { AppDispatch, RootState } from "@/store";
 import Spinner from "@/components/Modules/Spinner";
 
@@ -40,7 +44,13 @@ export default function SideBar() {
       dispatch(fetchEmojis(router.query.guild_id as string));
     }
     if (!dbStore.data) {
-      dispatch(fetchDatabase(router.query.guild_id as string));
+      dispatch(fetchDatabase(router.query.guild_id as string)).then(
+        (result) => {
+          if (!result.payload) {
+            dispatch(initDatabase(router.query.guild_id as string));
+          }
+        }
+      );
     }
   }, [router.isReady]);
 

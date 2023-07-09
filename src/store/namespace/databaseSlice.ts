@@ -18,8 +18,10 @@ const initialState: DBState = {
 
 export const initDatabase = createAsyncThunk(
   "database/init",
-  async (id: string) => {
-    return axios.post(`/api/database/${id}`).then((response) => response.data);
+  async (guild_id: string) => {
+    return axios
+      .post(`/api/database/${guild_id}`)
+      .then((response) => response.data);
   }
 );
 
@@ -257,6 +259,20 @@ export const dbSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(initDatabase.pending, (state) => {
+      state.loading = true;
+      state.error = undefined;
+    });
+    builder.addCase(initDatabase.fulfilled, (state, action) => {
+      state.loading = false;
+      state.data = action.payload;
+      state.original_data = action.payload;
+    });
+    builder.addCase(initDatabase.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
+
     builder.addCase(fetchDatabase.pending, (state) => {
       state.loading = true;
       state.error = undefined;
