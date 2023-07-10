@@ -98,10 +98,10 @@ export default function SideBar() {
                   <SkeletonLoader width="w-48" height="h-3.5" />
                 </div>
               </li>
-              {[...Array(3)].map(() => (
-                <li>
+              {[1, 2, 3].map((item) => (
+                <li key={item}>
                   <div className="relative flex flex-row items-center h-11">
-                    <div className="ml-4">
+                    <div className="mr-4">
                       <SkeletonLoader
                         width="w-6"
                         height="h-5"
@@ -112,8 +112,8 @@ export default function SideBar() {
                   </div>
                 </li>
               ))}
-              {[...Array(2)].map(() => (
-                <>
+              {[4, 5].map((item) => (
+                <div key={item}>
                   <li>
                     <div className="flex flex-row items-center h-8">
                       <SkeletonLoader width="w-48" height="h-3.5" />
@@ -121,7 +121,7 @@ export default function SideBar() {
                   </li>
                   <li>
                     <div className="relative flex flex-row items-center h-11">
-                      <div className="ml-4">
+                      <div className="mr-4">
                         <SkeletonLoader
                           width="w-6"
                           height="h-5"
@@ -131,7 +131,7 @@ export default function SideBar() {
                       <SkeletonLoader width="w-full" height="h-3.5" />
                     </div>
                   </li>
-                </>
+                </div>
               ))}
             </ul>
           </div>
