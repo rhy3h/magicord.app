@@ -3,12 +3,14 @@ import SideBar from "./SideBar";
 import { useSelector } from "react-redux";
 import { DiscordState } from "@/store/namespace/discordSlice";
 import { RootState } from "@/store";
-import Spinner from "@/components/Modules/Spinner";
+import SkeletonLoader from "@/components/Modules/SkeletonLoader";
+import { DBState } from "@/store/namespace/databaseSlice";
 
 export default function DashboardLayout(props: PropsWithChildren) {
   const discordStore = useSelector<RootState>(
     (state) => state.discord
   ) as DiscordState;
+  const dbState = useSelector<RootState>((state) => state.database) as DBState;
 
   return (
     <>
@@ -21,16 +23,31 @@ export default function DashboardLayout(props: PropsWithChildren) {
               <div className="flex items-center justify-end gap-x-6">
                 <button
                   type="button"
-                  className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                  className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
                   Login
                 </button>
               </div>
             </div>
           </div>
           <div className="p-[40px] h-[calc(100vh-80px)] overflow-auto">
-            {discordStore.guilds.loading || discordStore.channels.loading ? (
-              <div className="flex items-center justify-center h-screen">
-                <Spinner width="w-12" height="h-12" />
+            {discordStore.guilds.loading ||
+            discordStore.channels.loading ||
+            dbState.loading ? (
+              <div className="animate-pulse">
+                <div className="flex justify-between">
+                  <div className="w-full">
+                    <div className="my-2">
+                      <SkeletonLoader width="w-24" height="h-3.5" />
+                    </div>
+                    <div className="my-4">
+                      <SkeletonLoader width="w-56" height="h-3.5" />
+                    </div>
+                  </div>
+                </div>
+                <div className="my-3">
+                  <SkeletonLoader width="w-full" height="h-64" />
+                </div>
               </div>
             ) : (
               props.children

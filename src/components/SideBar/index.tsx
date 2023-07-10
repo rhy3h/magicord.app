@@ -10,13 +10,10 @@ import {
   fetchGuilds,
   fetchRoles,
 } from "@/store/namespace/discordSlice";
-import {
-  DBState,
-  fetchDatabase,
-  initDatabase,
-} from "@/store/namespace/databaseSlice";
+import { DBState, fetchDatabase } from "@/store/namespace/databaseSlice";
 import { AppDispatch, RootState } from "@/store";
 import Spinner from "@/components/Modules/Spinner";
+import SkeletonLoader from "@/components/Modules/SkeletonLoader";
 
 export default function SideBar() {
   const router = useRouter();
@@ -44,13 +41,7 @@ export default function SideBar() {
       dispatch(fetchEmojis(router.query.guild_id as string));
     }
     if (!dbStore.data) {
-      dispatch(fetchDatabase(router.query.guild_id as string)).then(
-        (result) => {
-          if (!result.payload) {
-            dispatch(initDatabase(router.query.guild_id as string));
-          }
-        }
-      );
+      dispatch(fetchDatabase(router.query.guild_id as string));
     }
   }, [router.isReady]);
 
@@ -100,8 +91,49 @@ export default function SideBar() {
         </div>
 
         {discordStore.guilds.loading || discordStore.channels.loading ? (
-          <div className="flex items-center justify-center h-screen">
-            <Spinner width="w-12" height="h-12" />
+          <div className="overflow-y-auto overflow-x-hidden flex-grow">
+            <ul className="flex flex-col py-4 space-y-1 ax-w-md rounded animate-pulse p-4">
+              <li>
+                <div className="flex flex-row items-center h-8">
+                  <SkeletonLoader width="w-48" height="h-3.5" />
+                </div>
+              </li>
+              {[...Array(3)].map(() => (
+                <li>
+                  <div className="relative flex flex-row items-center h-11">
+                    <div className="ml-4">
+                      <SkeletonLoader
+                        width="w-6"
+                        height="h-5"
+                        bg="bg-transparent"
+                      />
+                    </div>
+                    <SkeletonLoader width="w-full" height="h-3.5" />
+                  </div>
+                </li>
+              ))}
+              {[...Array(2)].map(() => (
+                <>
+                  <li>
+                    <div className="flex flex-row items-center h-8">
+                      <SkeletonLoader width="w-48" height="h-3.5" />
+                    </div>
+                  </li>
+                  <li>
+                    <div className="relative flex flex-row items-center h-11">
+                      <div className="ml-4">
+                        <SkeletonLoader
+                          width="w-6"
+                          height="h-5"
+                          bg="bg-transparent"
+                        />
+                      </div>
+                      <SkeletonLoader width="w-full" height="h-3.5" />
+                    </div>
+                  </li>
+                </>
+              ))}
+            </ul>
           </div>
         ) : (
           <div className="overflow-y-auto overflow-x-hidden flex-grow">
