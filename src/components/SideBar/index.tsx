@@ -90,7 +90,9 @@ export default function SideBar() {
           )}
         </div>
 
-        {discordStore.guilds.loading || discordStore.channels.loading ? (
+        {discordStore.guilds.loading ||
+        discordStore.channels.loading ||
+        dbStore.loading ? (
           <div className="overflow-y-auto overflow-x-hidden flex-grow">
             <ul className="flex flex-col py-4 space-y-1 ax-w-md rounded animate-pulse p-4">
               <li>
