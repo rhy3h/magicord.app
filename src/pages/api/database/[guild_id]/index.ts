@@ -35,17 +35,20 @@ export default async function handler(
         });
     }
     case "GET": {
-      await GuildModel.findById(guild_id)
-        .populate({
+      try {
+        let result = await GuildModel.findById(guild_id).populate({
           path: "reaction_roles",
           populate: { path: "reactions" },
-        })
-        .then((data) => {
-          res.status(200).send(data);
-        })
-        .catch((error) => {
-          res.status(400).send(error.message);
         });
+        if (!result) {
+          result = await GuildModel.create({
+            _id: guild_id as string,
+          });
+        }
+        res.status(200).send(result);
+      } catch (error) {
+        res.status(400).send(error);
+      }
       break;
     }
     case "PATCH": {
