@@ -50,6 +50,8 @@ export default async function handler(
       const modifiedReactions: Array<Reactions> = req.body.modifiedReactions;
       const addedReactions: Array<Reactions> = req.body.addedReactions;
       const removedReactions: Array<Reactions> = req.body.removedReactions;
+      const channel_id: string = req.body.channel_id;
+      const message: string = req.body.message;
 
       const modifiedBulk = modifiedReactions.map((m) => {
         return {
@@ -92,6 +94,17 @@ export default async function handler(
           reactionResult.insertedIds
         ).map((m) => m[1]);
         await ReactionRolesModel.bulkWrite([
+          {
+            updateOne: {
+              filter: { _id: new Types.ObjectId(reaction_roles_id as string) },
+              update: {
+                $set: {
+                  channel_id: channel_id,
+                  message: message,
+                },
+              },
+            },
+          },
           {
             updateOne: {
               filter: { _id: new Types.ObjectId(reaction_roles_id as string) },
