@@ -1,12 +1,13 @@
 import axios from "axios";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import type { Guilds, ReactionRoles, Reactions } from "@/models/Guilds";
+import { Guilds, ReactionRoles, Reactions } from "@/models/Guilds";
 
 export interface DBState {
   data: Guilds | null;
   original_data: Guilds | null;
   loading: boolean;
   error: string | undefined;
+  removedReactions: Array<Reactions>;
 }
 
 const initialState: DBState = {
@@ -14,6 +15,7 @@ const initialState: DBState = {
   original_data: null,
   loading: false,
   error: undefined,
+  removedReactions: [],
 };
 
 export const fetchDatabase = createAsyncThunk(
@@ -82,42 +84,6 @@ export const updateReactionRole = createAsyncThunk(
       .patch(
         `/api/database/${guild_id}/reaction-roles/${reaction_role_id}`,
         data
-      )
-      .then((response) => response.data);
-  }
-);
-
-export const addReaction = createAsyncThunk(
-  "database/add-reaction",
-  async ({
-    guild_id,
-    reaction_role_id,
-  }: {
-    guild_id: string;
-    reaction_role_id: string;
-  }) => {
-    return axios
-      .post(
-        `/api/database/${guild_id}/reaction-roles/${reaction_role_id}/reactions`
-      )
-      .then((response) => response.data);
-  }
-);
-
-export const removeReaction = createAsyncThunk(
-  "database/remove-reaction",
-  async ({
-    guild_id,
-    reaction_role_id,
-    reaction_id,
-  }: {
-    guild_id: string;
-    reaction_role_id: string;
-    reaction_id: string;
-  }) => {
-    return axios
-      .delete(
-        `/api/database/${guild_id}/reaction-roles/${reaction_role_id}/reactions/${reaction_id}`
       )
       .then((response) => response.data);
   }
@@ -210,11 +176,37 @@ export const dbSlice = createSlice({
         ) as ReactionRoles
       ).message_id = action.payload.message_id;
     },
+    addReaction(state, action: PayloadAction<string>) {
+      (
+        state.data!.reaction_roles.find(
+          (f) => (f as ReactionRoles)._id.toString() == action.payload
+        ) as ReactionRoles
+      ).reactions.push(JSON.parse(JSON.stringify(new Reactions())));
+    },
+    removeReaction(
+      state,
+      action: PayloadAction<{
+        reaction_role_id: string;
+        reaction_index: number;
+      }>
+    ) {
+      const reaction = (
+        state.data!.reaction_roles.find(
+          (f) =>
+            (f as ReactionRoles)._id.toString() ==
+            action.payload.reaction_role_id
+        ) as ReactionRoles
+      ).reactions.splice(action.payload.reaction_index, 1)[0] as Reactions;
+
+      if (reaction._id) {
+        state.removedReactions.push(reaction);
+      }
+    },
     setReactionEmojiId(
       state,
       action: PayloadAction<{
         reaction_role_id: string;
-        reaction_id: string;
+        reaction_index: number;
         emoji_name: string;
         emoji_id: string;
       }>
@@ -225,9 +217,7 @@ export const dbSlice = createSlice({
             (f as ReactionRoles)._id.toString() ==
             action.payload.reaction_role_id
         ) as ReactionRoles
-      ).reactions.find(
-        (ff) => (ff as Reactions)._id.toString() == action.payload.reaction_id
-      ) as Reactions;
+      ).reactions[action.payload.reaction_index] as Reactions;
       reactions.emoji_name = action.payload.emoji_name;
       reactions.emoji_id = action.payload.emoji_id;
     },
@@ -235,7 +225,7 @@ export const dbSlice = createSlice({
       state,
       action: PayloadAction<{
         reaction_role_id: string;
-        reaction_id: string;
+        reaction_index: number;
         role_id: string;
       }>
     ) {
@@ -246,9 +236,7 @@ export const dbSlice = createSlice({
               (f as ReactionRoles)._id.toString() ==
               action.payload.reaction_role_id
           ) as ReactionRoles
-        ).reactions.find(
-          (ff) => (ff as Reactions)._id.toString() == action.payload.reaction_id
-        ) as Reactions
+        ).reactions[action.payload.reaction_index] as Reactions
       ).role_id = action.payload.role_id;
     },
   },
@@ -276,20 +264,11 @@ export const dbSlice = createSlice({
     builder.addCase(removeReactionRole.fulfilled, (state, action) => {
       state.data!.reaction_roles = action.payload.reaction_roles;
     });
-
-    builder.addCase(addReaction.fulfilled, (state, action) => {
-      (
-        state.data!.reaction_roles.find(
-          (f) => (f as ReactionRoles)._id.toString() == action.payload._id
-        ) as ReactionRoles
-      ).reactions = action.payload.reactions;
-    });
-    builder.addCase(removeReaction.fulfilled, (state, action) => {
-      (
-        state.data!.reaction_roles.find(
-          (f) => (f as ReactionRoles)._id.toString() == action.payload._id
-        ) as ReactionRoles
-      ).reactions = action.payload.reactions;
+    builder.addCase(updateReactionRole.fulfilled, (state, action) => {
+      let index = state.data!.reaction_roles.findIndex(
+        (f) => (f as ReactionRoles)._id.toString() == action.payload._id
+      );
+      state.data!.reaction_roles[index] = action.payload;
     });
   },
 });
@@ -307,6 +286,8 @@ export const {
   setReactionRoleChannelId,
   setReactionRoleMessage,
   setReactionRoleMessageId,
+  addReaction,
+  removeReaction,
   setReactionEmojiId,
   setReactionRoleId,
 } = dbSlice.actions;

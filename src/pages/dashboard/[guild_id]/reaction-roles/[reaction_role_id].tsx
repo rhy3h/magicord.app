@@ -35,6 +35,9 @@ export default function ReactionRolesID() {
   const emojis = useSelector<RootState>(
     (state) => state.discord.emojis.data
   ) as Array<Emoji>;
+  const removedReactions = useSelector<RootState>(
+    (state) => state.database.removedReactions
+  ) as Array<ReactionRoles>;
   const reaction_roles = useSelector<RootState>(
     (state) => state.database.data?.reaction_roles
   ) as Array<ReactionRoles>;
@@ -46,21 +49,26 @@ export default function ReactionRolesID() {
   const saveReactionRoles = async () => {
     const guild_id = router.query.guild_id as string;
     const reaction_role_id = router.query.reaction_role_id as string;
-    return Promise.all([
-      dispatch(
-        updateReactionRole({
-          guild_id,
-          reaction_role_id,
-          data: {
-            channel_id: reaction_role?.channel_id,
-            message: reaction_role?.message,
-          },
-        })
-      ),
-      dispatch(
-        updateReactions({ guild_id, reaction_role_id, data: reactions })
-      ),
-    ]);
+    const modifiedReactions = reactions.filter(
+      (f) => f._id && f.emoji_id && f.role_id
+    );
+    const addedReactions = reactions.filter(
+      (f) => !f._id && f.emoji_id && f.role_id
+    );
+
+    return dispatch(
+      updateReactionRole({
+        guild_id,
+        reaction_role_id,
+        data: {
+          channel_id: reaction_role?.channel_id,
+          message: reaction_role?.message,
+          modifiedReactions: modifiedReactions,
+          addedReactions: addedReactions,
+          removedReactions: removedReactions,
+        },
+      })
+    );
   };
 
   return (
@@ -266,25 +274,9 @@ export default function ReactionRolesID() {
                 <button
                   type="button"
                   onClick={async () => {
-                    if (
-                      reactions.length &&
-                      (!reactions.slice(-1)[0].emoji_id ||
-                        !reactions.slice(-1)[0].role_id)
-                    ) {
-                      alert("Please select reaction and role first");
-                      return;
-                    }
-
-                    const guild_id = router.query
-                      .reaction_rolguild_ide_id as string;
                     const reaction_role_id = router.query
                       .reaction_role_id as string;
-
-                    const data = reactions;
-                    await dispatch(
-                      updateReactions({ guild_id, reaction_role_id, data })
-                    );
-                    dispatch(addReaction({ guild_id, reaction_role_id }));
+                    dispatch(addReaction(reaction_role_id));
                   }}
                   className="rounded-md bg-indigo-600 px-3 py-2 ml-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
@@ -295,7 +287,7 @@ export default function ReactionRolesID() {
               {reactions &&
                 reactions.map((reaction, index) => (
                   <div
-                    key={index}
+                    key={`${reaction._id}_${index}`}
                     className="mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6"
                   >
                     <div className="row-span-full">
@@ -311,7 +303,7 @@ export default function ReactionRolesID() {
                           onChange={(e) => {
                             const reaction_role_id = router.query
                               .reaction_role_id as string;
-                            const reaction_id = reaction._id.toString();
+                            const reaction_index = index;
                             const emoji_id = e.target.value;
                             const emoji_name = emojis.find(
                               (f) => f.id == emoji_id
@@ -319,7 +311,7 @@ export default function ReactionRolesID() {
                             dispatch(
                               setReactionEmojiId({
                                 reaction_role_id,
-                                reaction_id,
+                                reaction_index,
                                 emoji_name,
                                 emoji_id,
                               })
@@ -349,12 +341,12 @@ export default function ReactionRolesID() {
                           onChange={(e) => {
                             const reaction_role_id = router.query
                               .reaction_role_id as string;
-                            const reaction_id = reaction._id.toString();
+                            const reaction_index = index;
                             const role_id = e.target.value;
                             dispatch(
                               setReactionRoleId({
                                 reaction_role_id,
-                                reaction_id,
+                                reaction_index,
                                 role_id,
                               })
                             );
@@ -382,15 +374,13 @@ export default function ReactionRolesID() {
                         <div className="flex items-center justify-start gap-x-6">
                           <button
                             onClick={() => {
-                              const guild_id = router.query.guild_id as string;
                               const reaction_role_id = router.query
                                 .reaction_role_id as string;
-                              const reaction_id = reaction._id.toString();
+                              const reaction_index = index;
                               dispatch(
                                 removeReaction({
-                                  guild_id,
                                   reaction_role_id,
-                                  reaction_id,
+                                  reaction_index,
                                 })
                               );
                             }}
