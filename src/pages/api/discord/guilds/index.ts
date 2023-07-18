@@ -1,6 +1,7 @@
 import { getSession } from "next-auth/react";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Guild } from "@/types/discord";
+import axios from "axios";
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,26 +11,26 @@ export default async function handler(
 
   const promises = [];
   promises.push(
-    fetch("https://discord.com/api/users/@me/guilds", {
-      method: "Get",
-      headers: {
-        Authorization: `Bearer ${session?.user.accessToken}`,
-      },
-    }).then(async (response) => {
-      const data: Guild[] = await response.json();
-      return data.filter((f) => {
-        return (f.permissions & (1 << 3)) == 1 << 3; // Administrator
-      });
-    }),
-    fetch("https://discord.com/api/users/@me/guilds", {
-      method: "Get",
-      headers: {
-        Authorization: `Bot ${process.env.MAGICORD_ACCESS_TOKEN}`,
-      },
-    }).then(async (response) => {
-      const data: Guild[] = await response.json();
-      return data;
-    })
+    axios
+      .get("https://discord.com/api/users/@me/guilds", {
+        headers: {
+          Authorization: `Bearer ${session?.user.accessToken}`,
+        },
+      })
+      .then((result) => {
+        return result.data.filter((f: Guild) => {
+          return (f.permissions & (1 << 3)) == 1 << 3; // Administrator
+        });
+      }),
+    axios
+      .get("https://discord.com/api/users/@me/guilds", {
+        headers: {
+          Authorization: `Bot ${process.env.MAGICORD_ACCESS_TOKEN}`,
+        },
+      })
+      .then((result) => {
+        return result.data;
+      })
   );
   try {
     const result = await Promise.all(promises);
